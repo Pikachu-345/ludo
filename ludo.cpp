@@ -14,23 +14,23 @@ enum PlayerColor {
     b = 3
 };
 
-
+vector<POINT> prevpos = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
 //player creation
 //----red-----
 vector<POINT> redTokens = {{125, 125}, {175, 125}, {125, 175}, {175, 175}};
-Player red(r, redTokens); 
+Player red(r, redTokens,prevpos); 
 
 //----green-----
 vector<POINT> greenTokens = {{625, 125}, {675, 125}, {625, 175}, {675, 175}};
-Player green(g, greenTokens); 
+Player green(g, greenTokens,prevpos); 
 
 //----yellow-----
 vector<POINT> yellowTokens = {{725, 725}, {775, 725}, {725, 775}, {775, 775}};
-Player yellow(y, yellowTokens); 
+Player yellow(y, yellowTokens,prevpos); 
 
 //----blue-----
 vector<POINT> blueTokens = {{125, 725}, {175, 725}, {125, 775}, {175, 775}};
-Player blue(b, blueTokens);
+Player blue(b, blueTokens,prevpos);
 
 vector<Player> allPlayers={red,green,yellow,blue};
 
@@ -232,6 +232,8 @@ void DrawTokens(HDC hdc) {
                             CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH, TEXT("Arial"));
     HFONT oldFont = (HFONT)SelectObject(hdc, font);
 
+    HBRUSH whiteBrush = CreateSolidBrush(RGB(255, 255, 255)); // Brush to clear old positions
+
     for (int i = 0; i < 4; ++i) { // Loop over players
         HBRUSH brush;
         switch (i) {
@@ -242,6 +244,13 @@ void DrawTokens(HDC hdc) {
         }
 
         for (int j = 0; j < 4; ++j) { // Loop over each player's tokens
+            // Erase the old position by filling the cell with a white brush
+            int prevX = allPlayers[i].previousTokenPosition[j].x;
+            int prevY = allPlayers[i].previousTokenPosition[j].y;
+            RECT clearRect = {prevX - 24, prevY - 24, prevX + 24, prevY + 24};
+            FillRect(hdc, &clearRect, whiteBrush);
+
+            // Draw the token at the updated position
             SelectObject(hdc, brush);
             int x = allPlayers[i].tokenPosition[j].x;
             int y = allPlayers[i].tokenPosition[j].y;
@@ -261,5 +270,6 @@ void DrawTokens(HDC hdc) {
     DeleteObject(blueBrush);
     DeleteObject(greenBrush);
     DeleteObject(yellowBrush);
+    DeleteObject(whiteBrush);
 }
 

@@ -17,17 +17,22 @@ class Player{
     int player;//0->red 1->green 2=>yellow 3->blue
     vector<POINT> tokenPosition;
     vector<int> pos={-1,-1,-1,-1};
-    Player(int player,vector<POINT> tp){
-      this->player=player;
-      this -> tokenPosition=tp;
-    }
+    vector<POINT> previousTokenPosition; // New member to store the previous positions
+
+    // Constructor
+    Player(int color, vector<POINT> tokens,vector<POINT> prev)
+        : player(color),tokenPosition(tokens), previousTokenPosition(prev) {}
+    // Player(int player,vector<POINT> tp){
+    //   this->player=player;
+    //   this -> tokenPosition=tp;
+    // }
     void calculatePosition(int pieceID, int diceValue) {
         if (pieceID < 0 || pieceID > 3) {
             cout<<pieceID;
             MessageBox(nullptr, "Invalid Piece ID!", "Error", MB_OK | MB_ICONERROR);
             return;
         }
-
+        previousTokenPosition=tokenPosition;
         // Convert pieceID (1-based) to index (0-based)
         int index = pieceID;
 
@@ -56,7 +61,7 @@ class Player{
             return;
           }
           else{
-            cout<<"you can unlock piece only when you have 6!!";
+            cout<<"you can unlock piece only when you have 6!!\nchoose another piece which is unlocked!!";
             return;
           }
         }
