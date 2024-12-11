@@ -16,7 +16,7 @@ class Player{
     public:
     int player;//0->red 1->green 2=>yellow 3->blue
     vector<POINT> tokenPosition;
-    vector<int> pos={0,0,0,0};
+    vector<int> pos={-1,-1,-1,-1};
     Player(int player,vector<POINT> tp){
       this->player=player;
       this -> tokenPosition=tp;
@@ -33,20 +33,23 @@ class Player{
 
         // Get the current position of the token
         POINT& currentPos = tokenPosition[index];
-        if(pos[index]==0){
+        if(pos[index]==-1){
           if(diceValue==6){
-            pos[index]++;
             switch(player){
               case 0:
+                pos[index]=0;
                 currentPos=path[0];
                 break;
               case 1:
+                pos[index]=13;
                 currentPos=path[13];
                 break;
               case 2:
+                pos[index]=26;
                 currentPos=path[26];
                 break;
               case 3:
+                pos[index]=39;
                 currentPos=path[39];
                 break;
             }   

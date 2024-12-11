@@ -99,7 +99,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             // Check if all tokens are at the initial position
             bool allTokensAtStart = true;
             for (int tokenPos : allPlayers[currentPlayer].pos) {
-                if (tokenPos != 0) {
+                if (tokenPos != -1) {
                     allTokensAtStart = false;
                     break;
                 }
