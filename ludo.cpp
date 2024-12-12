@@ -86,7 +86,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         for (int i = 0; i < 4; ++i) {
             pieceButtons[i] = CreateWindow(
                 "BUTTON", std::to_string(i + 1).c_str(), WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-                850, 200 + i * 60, 50, 50, hwnd, reinterpret_cast<HMENU>(static_cast<intptr_t>(10 + i)), nullptr, nullptr
+                850, 250 + i * 60, 50, 50, hwnd, reinterpret_cast<HMENU>(static_cast<intptr_t>(10 + i)), nullptr, nullptr
             );
             ShowWindow(pieceButtons[i], SW_HIDE); // Initially hide
         }
@@ -121,7 +121,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             int pieceIndex = LOWORD(wParam) - 10;
 
             // Update the position of the selected piece
-            allPlayers[currentPlayer].calculatePosition(pieceIndex, diceValue);
+            allPlayers[currentPlayer].calculatePosition(pieceIndex, diceValue,allPlayers);
 
             // Hide the piece buttons
             for (int i = 0; i < 4; ++i) {
@@ -150,6 +150,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         char buffer[64];
         sprintf(buffer, "Player %d's Turn - Dice: %d", currentPlayer + 1, diceValue);
         TextOut(hdc, 850, 50, buffer, strlen(buffer));
+        
+        sprintf(buffer, "Move which piece?");
+        TextOut(hdc, 850, 200, buffer, strlen(buffer));
 
         EndPaint(hwnd, &ps);
     }
@@ -175,6 +178,8 @@ void DrawBoard(HDC hdc) {
     HBRUSH blue_brush = CreateSolidBrush(RGB(0, 0, 255)); // blue for Player 1
     HBRUSH green_brush = CreateSolidBrush(RGB(0, 255, 0)); // gren for Player 1
     HBRUSH yellow_brush = CreateSolidBrush(RGB(255, 255, 0)); // yellow for Player 1
+    HBRUSH gray_brush = CreateSolidBrush(RGB(128, 128, 128)); // yellow for Player 1
+    HBRUSH black_brush = CreateSolidBrush(RGB(20, 20, 20)); // yellow for Player 1
 
     RECT red_rect1 = { 50, 50, 350, 350 };
     RECT red_rect3 = { 100, 350, 150, 400 };
@@ -192,6 +197,19 @@ void DrawBoard(HDC hdc) {
     RECT blue_rect2 = {400,500,450,750};
     RECT blue_rect3 = {350,700,400,750};
 
+    RECT neutral1={350,150,400,200};
+    RECT neutral2={650,350,700,400};
+    RECT neutral3={450,650,500,700};
+    RECT neutral4={150,450,200,500};
+
+    RECT center={350,350,500,500};
+
+    FillRect(hdc, &center, black_brush);
+
+    FillRect(hdc, &neutral1, gray_brush);
+    FillRect(hdc, &neutral2, gray_brush);
+    FillRect(hdc, &neutral3, gray_brush);
+    FillRect(hdc, &neutral4, gray_brush);
 
     FillRect(hdc, &red_rect1, red_brush);
     FillRect(hdc, &red_rect2, red_brush);

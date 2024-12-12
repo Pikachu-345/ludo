@@ -12,21 +12,24 @@ vector<POINT>path={{125, 375}, {175, 375}, {225, 375}, {275, 375}, {325, 375},
                   {375, 575}, {375, 525}, {325, 475}, {275, 475}, {225, 475}, {175, 475}, 
                   {125, 475}, {75, 475}, {75, 425}, {75, 375}};
 
+set<int> safeSpots = {0, 8, 13, 21, 26, 34, 39, 47}; // Example indices, adjust as per your board
+
 class Player{
     public:
     int player;//0->red 1->green 2=>yellow 3->blue
     vector<POINT> tokenPosition;
+    vector<POINT> initialPosition;
     vector<int> pos={-1,-1,-1,-1};
     vector<POINT> previousTokenPosition; // New member to store the previous positions
 
     // Constructor
     Player(int color, vector<POINT> tokens,vector<POINT> prev)
-        : player(color),tokenPosition(tokens), previousTokenPosition(prev) {}
+        : player(color),tokenPosition(tokens),initialPosition(tokens), previousTokenPosition(prev) {}
     // Player(int player,vector<POINT> tp){
     //   this->player=player;
     //   this -> tokenPosition=tp;
     // }
-    void calculatePosition(int pieceID, int diceValue) {
+    void calculatePosition(int pieceID, int diceValue,vector<Player>&allPlayers) {
         if (pieceID < 0 || pieceID > 3) {
             cout<<pieceID;
             MessageBox(nullptr, "Invalid Piece ID!", "Error", MB_OK | MB_ICONERROR);
@@ -75,10 +78,26 @@ class Player{
           currentPos.y=550;
           return;
         }
-        else{
-          pos[index]+=diceValue;
-          currentPos=path[pos[index]%52];
-          return ;
+        
+          // pos[index]+=diceValue;
+          // currentPos=path[pos[index]%52];
+          // return ;
+        pos[index] += diceValue;
+        tokenPosition[index] = path[pos[index] % 52];
+
+        // Check for killing other pieces
+        if (safeSpots.find(pos[index] % 52) == safeSpots.end()) { // Not a safe spot
+            for (Player& otherPlayer : allPlayers) {
+                if (otherPlayer.player != player) { // Check only other players
+                    for (int j = 0; j < 4; ++j) {
+                        if (otherPlayer.pos[j] == pos[index]) { // Same spot
+                            otherPlayer.pos[j] = -1; // Reset position
+                            otherPlayer.tokenPosition[j] = otherPlayer.initialPosition[j]; // Move to initial position
+                            cout << "Player " << player << " killed Player " << otherPlayer.player << "'s piece!\n";
+                        }
+                    }
+                }
+            }
         }
     }
 };
