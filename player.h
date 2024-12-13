@@ -12,7 +12,7 @@ vector<POINT>path={{125, 375}, {175, 375}, {225, 375}, {275, 375}, {325, 375},
                   {375, 575}, {375, 525}, {325, 475}, {275, 475}, {225, 475}, {175, 475}, 
                   {125, 475}, {75, 475}, {75, 425}, {75, 375}};
 
-set<int> safeSpots = {0, 8, 13, 21, 26, 34, 39, 47}; // Example indices, adjust as per your board
+set<int> safeSpots = {0, 8, 13, 21, 26, 34, 39, 47}; 
 
 class Player{
     public:
@@ -20,7 +20,7 @@ class Player{
     vector<POINT> tokenPosition;
     vector<POINT> initialPosition;
     vector<int> pos={-1,-1,-1,-1};
-    vector<POINT> previousTokenPosition; // New member to store the previous positions
+    vector<POINT> previousTokenPosition;
 
     // Constructor
     Player(int color, vector<POINT> tokens,vector<POINT> prev)
@@ -36,10 +36,8 @@ class Player{
             return;
         }
         previousTokenPosition=tokenPosition;
-        // Convert pieceID (1-based) to index (0-based)
         int index = pieceID;
 
-        // Get the current position of the token
         POINT& currentPos = tokenPosition[index];
         if(pos[index]==-1){
           if(diceValue==6){
@@ -85,14 +83,13 @@ class Player{
         pos[index] += diceValue;
         tokenPosition[index] = path[pos[index] % 52];
 
-        // Check for killing other pieces
-        if (safeSpots.find(pos[index] % 52) == safeSpots.end()) { // Not a safe spot
+        if (safeSpots.find(pos[index] % 52) == safeSpots.end()) { 
             for (Player& otherPlayer : allPlayers) {
-                if (otherPlayer.player != player) { // Check only other players
+                if (otherPlayer.player != player) { 
                     for (int j = 0; j < 4; ++j) {
-                        if (otherPlayer.pos[j] == pos[index]) { // Same spot
-                            otherPlayer.pos[j] = -1; // Reset position
-                            otherPlayer.tokenPosition[j] = otherPlayer.initialPosition[j]; // Move to initial position
+                        if (otherPlayer.pos[j] == pos[index]) {
+                            otherPlayer.pos[j] = -1; 
+                            otherPlayer.tokenPosition[j] = otherPlayer.initialPosition[j]; 
                             cout << "Player " << player << " killed Player " << otherPlayer.player << "'s piece!\n";
                         }
                     }

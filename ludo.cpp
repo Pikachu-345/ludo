@@ -17,21 +17,27 @@ enum PlayerColor {
 vector<POINT> prevpos = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
 //player creation
 //----red-----
+vector<POINT> redd={{125,375}};
 vector<POINT> redTokens = {{125, 125}, {175, 125}, {125, 175}, {175, 175}};
 Player red(r, redTokens,prevpos); 
 
 //----green-----
+vector<POINT> greenn={{475,125}};
 vector<POINT> greenTokens = {{625, 125}, {675, 125}, {625, 175}, {675, 175}};
 Player green(g, greenTokens,prevpos); 
 
 //----yellow-----
+vector<POINT> yelloww={{725,475}};
 vector<POINT> yellowTokens = {{725, 725}, {775, 725}, {725, 775}, {775, 775}};
 Player yellow(y, yellowTokens,prevpos); 
 
 //----blue-----
+vector<POINT> bluee={{375,725}};
 vector<POINT> blueTokens = {{125, 725}, {175, 725}, {125, 775}, {175, 775}};
 Player blue(b, blueTokens,prevpos);
 
+
+vector<POINT> grayy={{375,225},{675,375},{475,675},{175,475}};
 vector<Player> allPlayers={red,green,yellow,blue};
 
 // Function prototypes
@@ -42,9 +48,7 @@ void DrawTokens(HDC hdc);
 int diceValue = 0;
 HWND diceButton, pieceButtons[4];
 
-
-// Initial positions of tokens
-int currentPlayer = 0; // Tracks which player's turn it is (0: Red, 1:Green , 2: Yellow, 3: Blue)
+int currentPlayer = 0; 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     char CLASS_NAME[] = "LudoGame";
@@ -79,7 +83,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     switch (uMsg) {
     case WM_CREATE:
 
-        srand(static_cast<unsigned int>(time(nullptr))); // Seed for random dice rolls
+        srand(static_cast<unsigned int>(time(nullptr))); 
         diceButton = CreateWindow("BUTTON", "Roll Dice", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
                               850, 100, 100, 50, hwnd, (HMENU)1, nullptr, nullptr);
 
@@ -88,15 +92,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 "BUTTON", std::to_string(i + 1).c_str(), WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
                 850, 250 + i * 60, 50, 50, hwnd, reinterpret_cast<HMENU>(static_cast<intptr_t>(10 + i)), nullptr, nullptr
             );
-            ShowWindow(pieceButtons[i], SW_HIDE); // Initially hide
+            ShowWindow(pieceButtons[i], SW_HIDE);
         }
 
         break;
     case WM_COMMAND:
-        if (LOWORD(wParam) == 1) { // Roll Dice button
-            diceValue = rand() % 6 + 1; // Random value between 1 and 6
+        if (LOWORD(wParam) == 1) { 
+            diceValue = rand() % 6 + 1; 
 
-            // Check if all tokens are at the initial position
             bool allTokensAtStart = true;
             for (int tokenPos : allPlayers[currentPlayer].pos) {
                 if (tokenPos != -1) {
@@ -105,48 +108,40 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 }
             }
 
-            // If all tokens are at the start and diceValue is not 6, move to the next player
             if (allTokensAtStart && diceValue != 6) {
-                currentPlayer = (currentPlayer + 1) % 4; // Move to the next player
+                currentPlayer = (currentPlayer + 1) % 4; 
             } else {
-                // Show piece buttons
                 for (int i = 0; i < 4; ++i) {
                     ShowWindow(pieceButtons[i], SW_SHOW);
                 }
             }
 
-            InvalidateRect(hwnd, nullptr, TRUE); // Redraw the window
+            InvalidateRect(hwnd, nullptr, TRUE); 
         } 
-        if (LOWORD(wParam) >= 10 && LOWORD(wParam) < 14) { // Piece buttons
+        if (LOWORD(wParam) >= 10 && LOWORD(wParam) < 14) { 
             int pieceIndex = LOWORD(wParam) - 10;
 
-            // Update the position of the selected piece
             allPlayers[currentPlayer].calculatePosition(pieceIndex, diceValue,allPlayers);
 
-            // Hide the piece buttons
             for (int i = 0; i < 4; ++i) {
                 ShowWindow(pieceButtons[i], SW_HIDE);
             }
 
-            // Move to the next player after the turn
-            currentPlayer = (currentPlayer + 1) % 4;
+            if(diceValue!=6) currentPlayer = (currentPlayer + 1) % 4;
 
-            InvalidateRect(hwnd, nullptr, TRUE); // Redraw the window
+            InvalidateRect(hwnd, nullptr, TRUE); 
         }
         break;
 
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
-
-        // Clear the area for text display
         RECT textRect = {850, 50, 1050, 150};
         FillRect(hdc, &textRect, (HBRUSH)(COLOR_WINDOW + 1));
 
         DrawBoard(hdc);
         DrawTokens(hdc);
 
-        // Display the dice value and current player
         char buffer[64];
         sprintf(buffer, "Player %d's Turn - Dice: %d", currentPlayer + 1, diceValue);
         TextOut(hdc, 850, 50, buffer, strlen(buffer));
@@ -170,10 +165,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 }
 
 void DrawBoard(HDC hdc) {
-    // Draw the Ludo board as a grid
     int cellSize = 50;
 
-    // Color specific areas for player zones
     HBRUSH red_brush = CreateSolidBrush(RGB(255, 0, 0)); // Red for Player 1
     HBRUSH blue_brush = CreateSolidBrush(RGB(0, 0, 255)); // blue for Player 1
     HBRUSH green_brush = CreateSolidBrush(RGB(0, 255, 0)); // gren for Player 1
@@ -246,35 +239,82 @@ void DrawTokens(HDC hdc) {
     HBRUSH blueBrush = CreateSolidBrush(RGB(0, 0, 255));
     HBRUSH greenBrush = CreateSolidBrush(RGB(0, 255, 0));
     HBRUSH yellowBrush = CreateSolidBrush(RGB(255, 255, 0));
+    HBRUSH grayBrush = CreateSolidBrush(RGB(128, 128, 128));
     HFONT font = CreateFont(20, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, 
                             CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH, TEXT("Arial"));
     HFONT oldFont = (HFONT)SelectObject(hdc, font);
 
-    HBRUSH whiteBrush = CreateSolidBrush(RGB(255, 255, 255)); // Brush to clear old positions
+    HBRUSH whiteBrush = CreateSolidBrush(RGB(255, 255, 255)); 
 
-    for (int i = 0; i < 4; ++i) { // Loop over players
+    for (int i = 0; i < 4; ++i) { 
         HBRUSH brush;
+        HBRUSH rectBrush=whiteBrush; 
         switch (i) {
-        case 0: brush = redBrush; break;
-        case 1: brush = greenBrush; break;
-        case 2: brush = yellowBrush; break;
-        case 3: brush = blueBrush; break;
+            case 0: brush = redBrush; break;
+            case 1: brush = greenBrush; break;
+            case 2: brush = yellowBrush; break;
+            case 3: brush = blueBrush; break;
         }
 
-        for (int j = 0; j < 4; ++j) { // Loop over each player's tokens
-            // Erase the old position by filling the cell with a white brush
+        for (int j = 0; j < 4; ++j) { 
             int prevX = allPlayers[i].previousTokenPosition[j].x;
             int prevY = allPlayers[i].previousTokenPosition[j].y;
+            POINT prevv=allPlayers[i].previousTokenPosition[j];
+            bool found=false;
+            if(!found){
+                for(auto i:redd){
+                    if(i.x==prevv.x && i.y==prevv.y){
+                        rectBrush=redBrush;
+                        // cout<<"red";
+                        found=true;
+                    }
+                }
+            }
+            if(!found){
+                for(auto i:bluee){
+                    if(i.x==prevv.x && i.y==prevv.y){
+                        rectBrush=blueBrush;
+                        // cout<<"b";
+                        found=true;
+                    }
+                }
+            }
+            if(!found){
+                for(auto i:yelloww){
+                    if(i.x==prevv.x && i.y==prevv.y){
+                        rectBrush=yellowBrush;
+                        // cout<<"y";
+                        found=true;
+                    }
+                }
+            }
+            if(!found){
+                for(auto i:greenn){
+                    if(i.x==prevv.x && i.y==prevv.y){
+                        rectBrush=greenBrush;
+                        // cout<<"g";
+                        found=true;
+                    }
+                }
+            }
+            if(!found){
+                for(auto i:grayy){
+                    if(i.x==prevv.x && i.y==prevv.y){
+                        rectBrush=grayBrush;
+                        // cout<<"gra";
+                        found=true;
+                    }
+                }
+            }
+            
             RECT clearRect = {prevX - 24, prevY - 24, prevX + 24, prevY + 24};
-            FillRect(hdc, &clearRect, whiteBrush);
+            FillRect(hdc, &clearRect, rectBrush);
 
-            // Draw the token at the updated position
             SelectObject(hdc, brush);
             int x = allPlayers[i].tokenPosition[j].x;
             int y = allPlayers[i].tokenPosition[j].y;
             Ellipse(hdc, x - 20, y - 20, x + 20, y + 20);
 
-            // Draw the token number inside the circle
             char label[2];
             sprintf(label, "%d", j + 1);
             SetBkMode(hdc, TRANSPARENT);
